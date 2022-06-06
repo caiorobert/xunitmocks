@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Alura.CoisasAFazer.Core.Models
+﻿namespace Alura.CoisasAFazer.Core.Models
 {
     /// <summary>
     /// Representa uma classificação dada a <see cref="Tarefa"/>.
@@ -21,7 +19,7 @@ namespace Alura.CoisasAFazer.Core.Models
         /// Identificador da categoria
         /// </summary>
         public int Id { get; private set; }
-        
+
         /// <summary>
         /// Descrição da categoria
         /// </summary>

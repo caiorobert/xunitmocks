@@ -5,18 +5,14 @@ namespace Alura.CoisasAFazer.Infrastructure
 {
     public class DbTarefasContext : DbContext
     {
-        public DbTarefasContext(DbContextOptions options) : base(options)
-        {
-        }
+        public DbTarefasContext(DbContextOptions options) : base(options) { }
 
-        public DbTarefasContext()
-        {
-        }
+        public DbTarefasContext() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (optionsBuilder.IsConfigured) return;
-            
+
             optionsBuilder.UseSqlServer(@"Data Source=WKSJUN000348\SQLEXPRESS;Initial Catalog=DbTarefas;Trusted_Connection=true;");
         }
 

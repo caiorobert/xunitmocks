@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Alura.CoisasAFazer.Core.Commands
 {
-    public class ObtemCategoriaPorId: IRequest<Categoria>
+    public class ObtemCategoriaPorId : IRequest<Categoria>
     {
         public ObtemCategoriaPorId(int idCategoria)
         {

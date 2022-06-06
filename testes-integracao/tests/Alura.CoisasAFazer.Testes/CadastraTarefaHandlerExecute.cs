@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -122,6 +121,37 @@ namespace Alura.CoisasAFazer.Testes
             //assert
             //COMO VERIFICAR SE O LOG FOI REALIZADO?
             Assert.Contains("Persistindo a tarefa...", logOutput);
+        }
+
+        [Fact]
+        public void QuandoExceptionForLancadaDeveLogarAMensagemDaExcecao()
+        {
+            //arrange
+            var mensagemErro = "Houve um erro na inclusão...";
+            var excecaoEsperada = new Exception(mensagemErro);
+            var comando = new CadastraTarefa("Estudar Xunit", new Categoria("Estudo"), new DateTime(2019, 12, 31));
+            //setup do dublê
+            var mock = new Mock<IRepositorioTarefas>();
+            var repo = mock.Object;
+            //como configurar o lançamento da exceção? no próprio teste!
+            mock.Setup(r => r.IncluirTarefas(It.IsAny<Tarefa[]>())).Throws(excecaoEsperada);
+
+            var logger = new Mock<ILogger<CadastraTarefaHandler>>();
+
+            var handler = new CadastraTarefaHandler(repo, logger.Object);
+
+            //act: mudança no design da solução! TDD
+            CommandResult resultado = handler.Execute(comando);
+
+            //assert
+            logger.Verify(l =>
+                l.Log(
+                    LogLevel.Error, //nível de log => LogError
+                    It.IsAny<EventId>(), //identificador do evento
+                    It.IsAny<object>(), //objeto que será logado
+                    excecaoEsperada, // exceção que será logada
+                    It.IsAny<Func<object, Exception, string>>() //função que converte objeto e a exceção em uma string
+                ), Times.Once());
         }
     }
 }

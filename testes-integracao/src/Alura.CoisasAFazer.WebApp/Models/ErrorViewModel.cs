@@ -1,5 +1,3 @@
-using System;
-
 namespace Alura.CoisasAFazer.WebApp.Models
 {
     public class ErrorViewModel
