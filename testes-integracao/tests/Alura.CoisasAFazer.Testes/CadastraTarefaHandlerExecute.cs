@@ -120,7 +120,7 @@ namespace Alura.CoisasAFazer.Testes
 
             //assert
             //COMO VERIFICAR SE O LOG FOI REALIZADO?
-            Assert.Contains("Persistindo a tarefa...", logOutput);
+            Assert.Contains("Persistindo a tarefa", logOutput);
         }
 
         [Fact]
@@ -152,6 +152,48 @@ namespace Alura.CoisasAFazer.Testes
                     excecaoEsperada, // exceção que será logada
                     It.IsAny<Func<object, Exception, string>>() //função que converte objeto e a exceção em uma string
                 ), Times.Once());
+        }
+
+        delegate void CapturaMensagemLog(LogLevel level, EventId eventId, object state, Exception exception, Func<object, Exception, string> function);
+
+        [Fact]
+        public void DadaTarefaComInformacoesValidasDeveLogar()
+        {
+            //arrange
+            var tituloTarefaEsperado = "Usar Moq para aprofundar conhecimento API";
+            var comando = new CadastraTarefa(tituloTarefaEsperado, new Categoria(100, "Estudo"), new DateTime(2019, 12, 31));
+
+            var mockLogger = new Mock<ILogger<CadastraTarefaHandler>>();
+
+            LogLevel levelCapturado = LogLevel.Error;
+            string mensagemCapturada = string.Empty;
+
+            CapturaMensagemLog captura = (level, eventId, state, exception, func) =>
+            {
+                levelCapturado = level;
+                mensagemCapturada = func(state, exception);
+            };
+
+            mockLogger.Setup(l =>
+                l.Log(
+                    It.IsAny<LogLevel>(), //nível de log => LogError
+                    It.IsAny<EventId>(), //identificador do evento
+                    It.IsAny<object>(), //objeto que será logado
+                    It.IsAny<Exception>(), // exceção que será logada
+                    It.IsAny<Func<object, Exception, string>>() //função que converte objeto e a exceção em uma string
+                )).Callback(captura);
+
+            var mock = new Mock<IRepositorioTarefas>();
+
+
+            var handler = new CadastraTarefaHandler(mock.Object, mockLogger.Object);
+
+            //act
+            handler.Execute(comando);
+
+            //assert
+            Assert.Equal(LogLevel.Debug, levelCapturado);
+            Assert.Contains(tituloTarefaEsperado, mensagemCapturada);
         }
     }
 }
